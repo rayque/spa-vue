@@ -7,10 +7,11 @@
   
 <span slot="principal">
 
-      <h2>Login</h2>
-    <input type="text" placeholder="E-mail" value="">
-    <input type="text" placeholder="senha" value="">
-    <button type="button" class="btn">Entrar</button>   
+    <h2>Login</h2>
+    <input type="text" placeholder="E-mail" v-model="email">
+    <input type="password" placeholder="senha" v-model="password">
+    <button type="button" class="btn" v-on:click="login()">Entrar</button>   
+    
     <router-link to="/cadastro" class="btn orange"> Cadastre-se </router-link>
 
 </span>
@@ -20,17 +21,52 @@
 
 <script>  
 import LoginTemplate from '@/templates/LoginTemplate'
+import axios from 'axios'
 
 export default {
   name: 'Login',
   props: [],
   data(){
     return{
+      email:'',
+      password:'',
     }
   },
   components:{
     LoginTemplate,
+    axios,
   },
+  methods:{
+    login(){
+      axios.post('http://localhost:8000/api/login', {
+        email:this.email,
+        password:this.password,
+      })
+      .then(response => {
+         if (response.data.token) {
+           console.log("User Exist!");
+           alert("User Exist!");
+         } else if (response.data.status == false) {
+           console.log("Login does not exist!");
+           alert("Login does not exist!");
+         } else {
+           console.log("Validation erros!");
+           let erros = '';
+           for (let erro of Object.values(response.data)) {
+             erros +=  erro +=" ";              
+           }
+           alert(erros);
+         }
+      })
+      .catch(e => {
+        console.log(e);
+        alert("Error! Please, Try again later.");
+
+      })
+        
+    }
+  },
+  
 }
 </script>
 
