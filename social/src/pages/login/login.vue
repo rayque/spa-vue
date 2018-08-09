@@ -44,8 +44,8 @@ export default {
       })
       .then(response => {
          if (response.data.token) {
-           console.log("User Exist!");
-           alert("User Exist!");
+           sessionStorage.setItem('usuario', JSON.stringify(response.data));
+           this.$router.push('/');
          } else if (response.data.status == false) {
            console.log("Login does not exist!");
            alert("Login does not exist!");

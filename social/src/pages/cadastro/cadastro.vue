@@ -8,11 +8,11 @@
 <span slot="principal">
 
       <h2>Cadastro</h2>
-    <input type="text" placeholder="Nome" value="">
-    <input type="text" placeholder="E-mail" value="">
-    <input type="text" placeholder="senha" value="">
-    <input type="text" placeholder="Confirme sua senha" value="">
-    <button type="button" class="btn">Cadastrar</button>    
+    <input type="text" placeholder="Nome" v-model="name">
+    <input type="text" placeholder="E-mail" v-model="email">
+    <input type="password" placeholder="senha" v-model="password">
+    <input type="password" placeholder="Confirme sua senha" v-model="password_confirmation">
+    <button type="button" class="btn" v-on:click="cadastro()">Cadastrar</button>    
     <router-link to="/login" class="btn orange"> Já tenho conta </router-link>
 
 
@@ -23,16 +23,53 @@
 
 <script>  
 import LoginTemplate from '@/templates/LoginTemplate'
+import axios from  'axios'
 
 export default {
   name: 'Cadastro',
   props: [],
   data(){
     return{ 
+      name:'',
+      email:'',
+      password:'',
+      password_confirmation:'',
     }
   },
   components:{
     LoginTemplate,
+  },
+    methods:{
+    cadastro(){
+      axios.post('http://localhost:8000/api/cadastro', {
+        name: this.name,
+        email: this.email,
+        password: this.password,
+        password_confirmation: this.password_confirmation, 
+      })
+      .then(response => {
+         if (response.data.token) {
+           console.log("Success register!");           
+           sessionStorage.setItem('usuario', JSON.stringify(response.data));
+           this.$router.push('/');
+         } else if (response.data.status == false) {
+           alert("regitration error!");
+         } else {
+           console.log("Validation errors!");
+           let erros = '';
+           for (let erro of Object.values(response.data)) {
+             erros +=  erro +=" ";              
+           }
+           alert(erros);
+         }
+      })
+      .catch(e => {
+        console.log(e);
+        alert("Error! Please, Try again later.");
+
+      })
+        
+    }
   },
 }
 </script>
